@@ -30,7 +30,7 @@ docker compose up -d
 To view logs from the ThingsBoard service:
 
 ```bash
-docker compose logs thingsboard-ce
+docker compose logs tb-node
 ```
 
 ---
