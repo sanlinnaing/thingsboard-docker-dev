@@ -1,0 +1,45 @@
+services:
+  cassandra-init:
+    image: cassandra:4.1.3
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    entrypoint: >
+      bash -c "
+      echo 'Waiting for Cassandra to be ready...' &&
+      until cqlsh cassandra -e 'DESCRIBE KEYSPACES' >/dev/null 2>&1; do
+        echo 'Cassandra not ready yet... retrying in 10s';
+        sleep 10;
+      done;
+      echo 'Checking if keyspace exists...' &&
+      if cqlsh cassandra -e 'DESCRIBE KEYSPACE thingsboard' >/dev/null 2>&1; then
+        echo 'Keyspace thingsboard already exists. Skipping creation.';
+      else
+        echo 'Creating thingsboard keyspace...' &&
+        cqlsh cassandra -e \"CREATE KEYSPACE thingsboard WITH replication = {'class':'SimpleStrategy','replication_factor':1};\" &&
+        echo 'Keyspace created successfully.';
+      fi
+      "
+    restart: "no"
+
+  thingsboard-init:
+    image: "thingsboard/tb-node:3.4.3"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      cassandra:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      cassandra-init:
+        condition: service_completed_successfully
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/thingsboard
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      DATABASE_TS_TYPE: cassandra
+      CASSANDRA_URL: cassandra:9042
+      INSTALL_TB: true
+      LOAD_DEMO: true
+      install.data_dir: /usr/share/thingsboard/data
+    restart: "no"
