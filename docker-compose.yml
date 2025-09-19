@@ -105,7 +105,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-
   redisinsight:
     image: redis/redisinsight:latest
     restart: always
@@ -115,6 +114,20 @@ services:
       - redisinsight-data:/data
     depends_on:
       redis:
+        condition: service_healthy
+
+  cassweb:
+    image: ipushc/cassandra-web:latest
+    restart: always
+    ports:
+      - "8081:8083"   # Access GUI at http://localhost:8081
+    environment:
+      CASSWEB_HOST: "0.0.0.0"
+      CASSWEB_PORT: 8083
+      CASSWEB_CASSANDRA_HOST: cassandra
+      CASSWEB_CASSANDRA_PORT: 9042
+    depends_on:
+      cassandra:
         condition: service_healthy
 
 volumes:

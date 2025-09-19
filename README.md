@@ -1,6 +1,6 @@
 # ThingsBoard 3.4.3 Monolithic Dev Setup (Docker Compose)
 
-This setup provides a **monolithic ThingsBoard CE 3.4.3** development environment with PostgreSQL, Cassandra, Redis, **pgAdmin** (Postgres GUI), and **RedisInsight** (Redis GUI).  
+This setup provides a **monolithic ThingsBoard CE 3.4.3** development environment with PostgreSQL, Cassandra, Redis, **pgAdmin** (Postgres GUI), **RedisInsight** (Redis GUI), and **CassWeb** (Cassandra GUI).  
 
 ---
 
@@ -18,7 +18,7 @@ Once initialization completes successfully, you can stop the init container.
 ---
 
 ### 2. Start the stack
-Run all services (ThingsBoard, Postgres, Cassandra, Redis, pgAdmin, RedisInsight):
+Run all services (ThingsBoard, Postgres, Cassandra, Redis, pgAdmin, RedisInsight, CassWeb):
 
 ```bash
 docker compose up -d
@@ -55,11 +55,15 @@ docker compose logs tb-node
     - Host: `redis`  
     - Port: `6379`
 
+- **CassWeb (Cassandra GUI)** → [http://localhost:8081](http://localhost:8081)  
+  - Default configuration connects to `cassandra:9042` inside Docker.  
+  - Lets you browse **keyspaces**, **tables**, and run **CQL queries**.
+
 ---
 
-## 🗄️ Cassandra Quick Check
+## 🗄️ Cassandra Quick Check (CLI)
 
-You can verify that Cassandra is running and the ThingsBoard schema exists.
+You can also verify Cassandra manually with CQLSH.
 
 ### 1. Open CQLSH client inside the container
 ```bash
